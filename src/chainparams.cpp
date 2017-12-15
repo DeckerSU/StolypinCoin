@@ -40,7 +40,7 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
 
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = ""I create my owncoin 15/12/2017 for test , End its work for me. I hope this guide help you""; //Замена даты
+    const char* pszTimestamp = "I create my owncoin 15/12/2017 for test , End its work for me. I hope this guide help you"; //Замена даты
     const CScript genesisOutputScript = CScript() << ParseHex("04ec78337cd85e98f20a574000408c8d9c87cc6ae4d952fc315cbccdb5ae6b467be4ecad15f322f141faf2eca7755f3bde4e5e3aecd2abdfbfe76a514e8d994f97") << OP_CHECKSIG; //замена хеша
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
