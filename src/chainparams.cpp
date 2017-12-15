@@ -16,6 +16,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include "chainparamsseeds.h"
+#include "arith_uint256.h"
 
 static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesisOutputScript, uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
@@ -130,23 +131,48 @@ public:
         nPruneAfterHeight = 100000;
 
 	int32_t z; uint32_t nonce; uint8_t *ptr = (uint8_t *)&consensus.hashGenesisBlock;
-        for (nonce=100000; nonce<900000000; nonce++)
+        arith_uint256 bnTarget;
+        arith_uint256 tmp; int32_t i;
+        bool fNegative;
+        bool fOverflow;
+
+        for (nonce=9973384; nonce<900000000; nonce++)
         {
             genesis = CreateGenesisBlock(1513296000, nonce, 0x1e0ffff0, 1, 50 * COIN);
             consensus.hashGenesisBlock = genesis.GetHash();
             // condition to avoid "CheckProofOfWork() : hash doesn't match nBits"
             //   https://bitcointalk.org/index.php?topic=391983.msg4223449#msg4223449
             //   https://pastebin.com/jDMPUNuP
-            if ( ptr[31] == 0 && ptr[30] == 0 && ptr[29] == 0 && (ptr[28] & 0x80) == 0)
-                break; 
+            //if ( ptr[31] == 0 && ptr[30] == 0 && ptr[29] == 0 && (ptr[28] & 0x80) == 0)
+            //    break; 
+
+            bnTarget.SetCompact(0x1e0ffff0, &fNegative, &fOverflow);
+            
+
+    	    if (UintToArith256(consensus.hashGenesisBlock) <= bnTarget) { 
+		// Found genesis block 
+	        printf("[Decker] Start ... \n");
+        	tmp = UintToArith256(consensus.hashGenesisBlock);
+	        for (i=31; i>=0; i--)
+                printf("%02x",((uint8_t *)&tmp)[i]);
+	        printf(" hash vs target ");
+	        for (i=31; i>=0; i--)
+	            printf("%02x",((uint8_t *)&bnTarget)[i]);
+        	printf("\n");
+	        printf("[Decker] End ... \n");
+
+	   	break; }
+
             if ( (nonce % 100000) == 99999 )
                 fprintf(stderr,"%d ",nonce);
         }
 
-        //genesis = CreateGenesisBlock(1513296000, 2439879, 0x1e0ffff0, 1, 50 * COIN); //замена даты в unix
+        //genesis = CreateGenesisBlock(1513296000, 9973384, 0x1e0ffff0, 1, 50 * COIN); 
         //consensus.hashGenesisBlock = genesis.GetHash();
- 
+
+        /*
         printf("nonce.%u\n",nonce);
+
         for (z=31; z>=0; z--)
             printf("%02x",ptr[z]);
         printf(" <- genesis\n");
@@ -154,15 +180,15 @@ public:
         for (z=31; z>=0; z--)
             printf("%02x",ptr[z]);
         printf(" <- merkle\n");
+        */
 
         /*
         genesis = CreateGenesisBlock(1513296000, 2432118, 0x1e0ffff0, 1, 50 * COIN); //замена даты в unix
         consensus.hashGenesisBlock = genesis.GetHash();
         */
 
-        assert(consensus.hashGenesisBlock == uint256S("0x00002fe4b846b6ef06babcdb0d7d9e41dfb61401801e6dce28d1ad5dbbc2fa93"));
-        assert(genesis.hashMerkleRoot == uint256S("0xdfb660683ba5a0986a70910e9cf6a19e693d5f9907755bb54c01c6b27f0633a0"));
-
+	assert(consensus.hashGenesisBlock == uint256S("0x0000001b868b7bd8cafa14ebba98684ce6f57d993635f69821a8bac124274045"));
+	assert(genesis.hashMerkleRoot == uint256S("0x1687fbd0643c8eee4ffedd466a1df697c76c53eb7db2e5c93a91fd363f938175"));
 
         //vSeeds.push_back(CDNSSeedData("vivonodes.space", "dns.vivonodes.space"));
         //vSeeds.push_back(CDNSSeedData("shmest.win", "dns.shmest.win"));
@@ -196,8 +222,8 @@ public:
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
-            (    0, uint256S("0x731d60b08e1ed2649ca15796b696dfb351c7ae8d367e116bac518ad6b25ee839")),
-            
+            (    0, uint256S("0x0000001b868b7bd8cafa14ebba98684ce6f57d993635f69821a8bac124274045")),
+
             1513296000, // * UNIX timestamp of last checkpoint block
             98542,    // * total number of transactions between genesis and last checkpoint
                         //   (the tx=... number in the SetBestChain debug.log lines)
@@ -294,8 +320,8 @@ public:
 
         genesis = CreateGenesisBlock(1513296000, 2439879, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x00002fe4b846b6ef06babcdb0d7d9e41dfb61401801e6dce28d1ad5dbbc2fa93"));
-        assert(genesis.hashMerkleRoot == uint256S("0xdfb660683ba5a0986a70910e9cf6a19e693d5f9907755bb54c01c6b27f0633a0"));
+	assert(consensus.hashGenesisBlock == uint256S("0x0000001b868b7bd8cafa14ebba98684ce6f57d993635f69821a8bac124274045"));
+	assert(genesis.hashMerkleRoot == uint256S("0x1687fbd0643c8eee4ffedd466a1df697c76c53eb7db2e5c93a91fd363f938175"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -391,14 +417,14 @@ public:
         nMaxTipAge = 0x7fffffff; // allow mining on top of old blocks for testnet
         nPruneAfterHeight = 1000;
 
-	genesis = CreateGenesisBlock(1513296000, 2439879, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1513296000, 9973384, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x00002fe4b846b6ef06babcdb0d7d9e41dfb61401801e6dce28d1ad5dbbc2fa93"));
-        assert(genesis.hashMerkleRoot == uint256S("0xdfb660683ba5a0986a70910e9cf6a19e693d5f9907755bb54c01c6b27f0633a0"));
+	assert(consensus.hashGenesisBlock == uint256S("0x0000001b868b7bd8cafa14ebba98684ce6f57d993635f69821a8bac124274045"));
+	assert(genesis.hashMerkleRoot == uint256S("0x1687fbd0643c8eee4ffedd466a1df697c76c53eb7db2e5c93a91fd363f938175"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("vivonodes.space",  "testnet-dns.vivonodes.space"));
+        //vSeeds.push_back(CDNSSeedData("vivonodes.space",  "testnet-dns.vivonodes.space"));
 
         // Testnet Vivo addresses start with 'n'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,112);
@@ -497,14 +523,14 @@ public:
         nMaxTipAge = 0x7fffffff; // allow mining on top of old blocks for testnet
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1513296000, 2439879, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1513296000, 9973384, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x00002fe4b846b6ef06babcdb0d7d9e41dfb61401801e6dce28d1ad5dbbc2fa93"));
-        assert(genesis.hashMerkleRoot == uint256S("0xdfb660683ba5a0986a70910e9cf6a19e693d5f9907755bb54c01c6b27f0633a0"));
+	assert(consensus.hashGenesisBlock == uint256S("0x0000001b868b7bd8cafa14ebba98684ce6f57d993635f69821a8bac124274045"));
+	assert(genesis.hashMerkleRoot == uint256S("0x1687fbd0643c8eee4ffedd466a1df697c76c53eb7db2e5c93a91fd363f938175"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("vivonodes.space",  "testnet-dns.vivonodes.space"));
+        //vSeeds.push_back(CDNSSeedData("vivonodes.space",  "testnet-dns.vivonodes.space"));
 
         fMiningRequiresPeers = false;
         fDefaultConsistencyChecks = true;
