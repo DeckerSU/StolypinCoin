@@ -131,12 +131,24 @@ public:
 
         genesis = CreateGenesisBlock(1513296000, 2432118, 0x1e0ffff0, 1, 50 * COIN); //замена даты в unix
         consensus.hashGenesisBlock = genesis.GetHash();
+
+	 // [+] Decker
+        int32_t z; uint32_t nonce; uint8_t *ptr = (uint8_t *)&consensus.hashGenesisBlock;
+	for (z=31; z>=0; z--)
+            printf("%02x",ptr[z]);
+        printf(" <- genesis\n");
+        ptr = (uint8_t *)&genesis.hashMerkleRoot;
+        for (z=31; z>=0; z--)
+            printf("%02x",ptr[z]);
+	printf(" <- merkle\n");
+	// [+] Decker
+
         assert(consensus.hashGenesisBlock == uint256S("0x731d60b08e1ed2649ca15796b696dfb351c7ae8d367e116bac518ad6b25ee839"));
         assert(genesis.hashMerkleRoot == uint256S("0xbe0aacc16c8a4f051d029109281fff0b23942effc171355d0c6f1653d6cb650a"));
 
 
-        vSeeds.push_back(CDNSSeedData("vivonodes.space", "dns.vivonodes.space"));
-        vSeeds.push_back(CDNSSeedData("shmest.win", "dns.shmest.win"));
+        //vSeeds.push_back(CDNSSeedData("vivonodes.space", "dns.vivonodes.space"));
+        //vSeeds.push_back(CDNSSeedData("shmest.win", "dns.shmest.win"));
 
         // Vivo addresses start with 'V'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,70);
