@@ -121,10 +121,10 @@ public:
          */
 
         // Vivo BIP44 coin type is '5'
-        pchMessageStart[0] = 0x1d;
-        pchMessageStart[1] = 0x42;
-        pchMessageStart[2] = 0x5b;
-        pchMessageStart[3] = 0xa7;
+        pchMessageStart[0] = 0xba;
+        pchMessageStart[1] = 0xba;
+        pchMessageStart[2] = 0xde;
+        pchMessageStart[3] = 0xad;
         vAlertPubKey = ParseHex("04c40235feb5a1a0364ea89b1dc95c7625d07e889f7da8b302fd7859a37315b8fd64ada3faf95d388eb153c58174e735263659c2ea859c29c3438308d113bf2b83"); //замена хеша
         nDefaultPort = 12845;
         nMaxTipAge = 6 * 60 * 60; // ~144 blocks behind -> 2 x fork detection time, was 24 * 60 * 60 in bitcoin
@@ -132,7 +132,8 @@ public:
 
 	int32_t z; uint32_t nonce; uint8_t *ptr = (uint8_t *)&consensus.hashGenesisBlock;
         arith_uint256 bnTarget;
-        arith_uint256 tmp; int32_t i;
+        arith_uint256 tmp; 
+        int32_t i;
         bool fNegative;
         bool fOverflow;
 
@@ -147,12 +148,11 @@ public:
             //    break; 
 
             bnTarget.SetCompact(0x1e0ffff0, &fNegative, &fOverflow);
-            
+            tmp = UintToArith256(consensus.hashGenesisBlock);
 
-    	    if (UintToArith256(consensus.hashGenesisBlock) <= bnTarget) { 
+    	    if (tmp <= bnTarget) { 
 		// Found genesis block 
 	        printf("[Decker] Start ... \n");
-        	tmp = UintToArith256(consensus.hashGenesisBlock);
 	        for (i=31; i>=0; i--)
                 printf("%02x",((uint8_t *)&tmp)[i]);
 	        printf(" hash vs target ");
@@ -170,7 +170,7 @@ public:
         //genesis = CreateGenesisBlock(1513296000, 9973384, 0x1e0ffff0, 1, 50 * COIN); 
         //consensus.hashGenesisBlock = genesis.GetHash();
 
-        /*
+        
         printf("nonce.%u\n",nonce);
 
         for (z=31; z>=0; z--)
@@ -180,7 +180,7 @@ public:
         for (z=31; z>=0; z--)
             printf("%02x",ptr[z]);
         printf(" <- merkle\n");
-        */
+        
 
         /*
         genesis = CreateGenesisBlock(1513296000, 2432118, 0x1e0ffff0, 1, 50 * COIN); //замена даты в unix
@@ -225,9 +225,9 @@ public:
             (    0, uint256S("0x0000001b868b7bd8cafa14ebba98684ce6f57d993635f69821a8bac124274045")),
 
             1513296000, // * UNIX timestamp of last checkpoint block
-            98542,    // * total number of transactions between genesis and last checkpoint
+            0,          // * total number of transactions between genesis and last checkpoint
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            1000        // * estimated number of transactions per day after checkpoint
+            0           // * estimated number of transactions per day after checkpoint
         };
     }
 };
