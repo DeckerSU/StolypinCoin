@@ -208,7 +208,7 @@ public:
 
         nExtCoinType = 5;
 
-        fMiningRequiresPeers = true;
+        fMiningRequiresPeers = false;
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
