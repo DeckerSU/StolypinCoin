@@ -40,8 +40,8 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
 
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = "I create my owncoin 15/12/2017 for test , End its work for me. I hope this guide help you"; //Замена даты
-    const CScript genesisOutputScript = CScript() << ParseHex("04ec78337cd85e98f20a574000408c8d9c87cc6ae4d952fc315cbccdb5ae6b467be4ecad15f322f141faf2eca7755f3bde4e5e3aecd2abdfbfe76a514e8d994f97") << OP_CHECKSIG; //замена хеша
+    const char* pszTimestamp = "I was created it for tests ... "; 
+    const CScript genesisOutputScript = CScript() << ParseHex("04ec78337cd85e98f20a574000408c8d9c87cc6ae4d952fc315cbccdb5ae6b467be4ecad15f322f141faf2eca7755f3bde4e5e3aecd2abdfbfe76a514e8d994f97") << OP_CHECKSIG; 
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
 
@@ -129,22 +129,39 @@ public:
         nMaxTipAge = 6 * 60 * 60; // ~144 blocks behind -> 2 x fork detection time, was 24 * 60 * 60 in bitcoin
         nPruneAfterHeight = 100000;
 
-        genesis = CreateGenesisBlock(1513296000, 2432118, 0x1e0ffff0, 1, 50 * COIN); //замена даты в unix
-        consensus.hashGenesisBlock = genesis.GetHash();
+	int32_t z; uint32_t nonce; uint8_t *ptr = (uint8_t *)&consensus.hashGenesisBlock;
+        for (nonce=100000; nonce<900000000; nonce++)
+        {
+            genesis = CreateGenesisBlock(1513296000, nonce, 0x1e0ffff0, 1, 50 * COIN);
+            consensus.hashGenesisBlock = genesis.GetHash();
+            // condition to avoid "CheckProofOfWork() : hash doesn't match nBits"
+            //   https://bitcointalk.org/index.php?topic=391983.msg4223449#msg4223449
+            //   https://pastebin.com/jDMPUNuP
+            if ( ptr[31] == 0 && ptr[30] == 0 && ptr[29] == 0 && (ptr[28] & 0x80) == 0)
+                break; 
+            if ( (nonce % 100000) == 99999 )
+                fprintf(stderr,"%d ",nonce);
+        }
 
-	 // [+] Decker
-        int32_t z; uint32_t nonce; uint8_t *ptr = (uint8_t *)&consensus.hashGenesisBlock;
-	for (z=31; z>=0; z--)
+        //genesis = CreateGenesisBlock(1513296000, 2439879, 0x1e0ffff0, 1, 50 * COIN); //замена даты в unix
+        //consensus.hashGenesisBlock = genesis.GetHash();
+ 
+        printf("nonce.%u\n",nonce);
+        for (z=31; z>=0; z--)
             printf("%02x",ptr[z]);
         printf(" <- genesis\n");
         ptr = (uint8_t *)&genesis.hashMerkleRoot;
         for (z=31; z>=0; z--)
             printf("%02x",ptr[z]);
-	printf(" <- merkle\n");
-	// [+] Decker
+        printf(" <- merkle\n");
 
-        assert(consensus.hashGenesisBlock == uint256S("0x731d60b08e1ed2649ca15796b696dfb351c7ae8d367e116bac518ad6b25ee839"));
-        assert(genesis.hashMerkleRoot == uint256S("0xbe0aacc16c8a4f051d029109281fff0b23942effc171355d0c6f1653d6cb650a"));
+        /*
+        genesis = CreateGenesisBlock(1513296000, 2432118, 0x1e0ffff0, 1, 50 * COIN); //замена даты в unix
+        consensus.hashGenesisBlock = genesis.GetHash();
+        */
+
+        assert(consensus.hashGenesisBlock == uint256S("0x00002fe4b846b6ef06babcdb0d7d9e41dfb61401801e6dce28d1ad5dbbc2fa93"));
+        assert(genesis.hashMerkleRoot == uint256S("0xdfb660683ba5a0986a70910e9cf6a19e693d5f9907755bb54c01c6b27f0633a0"));
 
 
         //vSeeds.push_back(CDNSSeedData("vivonodes.space", "dns.vivonodes.space"));
@@ -275,10 +292,10 @@ public:
         nMaxTipAge = 0x7fffffff; // allow mining on top of old blocks for testnet
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1513296000, 2432118, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1513296000, 2439879, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x731d60b08e1ed2649ca15796b696dfb351c7ae8d367e116bac518ad6b25ee839"));
-        assert(genesis.hashMerkleRoot == uint256S("0xbe0aacc16c8a4f051d029109281fff0b23942effc171355d0c6f1653d6cb650a"));
+        assert(consensus.hashGenesisBlock == uint256S("0x00002fe4b846b6ef06babcdb0d7d9e41dfb61401801e6dce28d1ad5dbbc2fa93"));
+        assert(genesis.hashMerkleRoot == uint256S("0xdfb660683ba5a0986a70910e9cf6a19e693d5f9907755bb54c01c6b27f0633a0"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -374,10 +391,10 @@ public:
         nMaxTipAge = 0x7fffffff; // allow mining on top of old blocks for testnet
         nPruneAfterHeight = 1000;
 
-	genesis = CreateGenesisBlock(1513296000, 2432118, 0x1e0ffff0, 1, 50 * COIN);
+	genesis = CreateGenesisBlock(1513296000, 2439879, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x731d60b08e1ed2649ca15796b696dfb351c7ae8d367e116bac518ad6b25ee839"));
-        assert(genesis.hashMerkleRoot == uint256S("0xbe0aacc16c8a4f051d029109281fff0b23942effc171355d0c6f1653d6cb650a"));
+        assert(consensus.hashGenesisBlock == uint256S("0x00002fe4b846b6ef06babcdb0d7d9e41dfb61401801e6dce28d1ad5dbbc2fa93"));
+        assert(genesis.hashMerkleRoot == uint256S("0xdfb660683ba5a0986a70910e9cf6a19e693d5f9907755bb54c01c6b27f0633a0"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -480,10 +497,10 @@ public:
         nMaxTipAge = 0x7fffffff; // allow mining on top of old blocks for testnet
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1513296000, 2432118, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1513296000, 2439879, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x731d60b08e1ed2649ca15796b696dfb351c7ae8d367e116bac518ad6b25ee839"));
-        assert(genesis.hashMerkleRoot == uint256S("0xbe0aacc16c8a4f051d029109281fff0b23942effc171355d0c6f1653d6cb650a"));
+        assert(consensus.hashGenesisBlock == uint256S("0x00002fe4b846b6ef06babcdb0d7d9e41dfb61401801e6dce28d1ad5dbbc2fa93"));
+        assert(genesis.hashMerkleRoot == uint256S("0xdfb660683ba5a0986a70910e9cf6a19e693d5f9907755bb54c01c6b27f0633a0"));
 
         vFixedSeeds.clear();
         vSeeds.clear();

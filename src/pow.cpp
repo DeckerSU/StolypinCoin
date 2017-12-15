@@ -248,12 +248,23 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
 
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
+    int32_t z; uint32_t nonce; uint8_t *ptr = (uint8_t *)&hash;
+    for (z=31; z>=0; z--)
+    	printf("%02x",ptr[z]);
+    printf(" <- hash\n");
+    ptr = (uint8_t *)&bnTarget;
+    for (z=31; z>=0; z--)
+        printf("%02x",ptr[z]);
+    printf(" <- bnTarget\n");
+
+
     // Check range
     if (fNegative || bnTarget == 0 || fOverflow || bnTarget > UintToArith256(params.powLimit))
         return error("CheckProofOfWork(): nBits below minimum work");
 
     // Check proof of work matches claimed amount
     if (UintToArith256(hash) > bnTarget)
+        printf("CheckProofOfWork(): hash doesn't match nBits");
         return error("CheckProofOfWork(): hash doesn't match nBits");
 
     return true;
